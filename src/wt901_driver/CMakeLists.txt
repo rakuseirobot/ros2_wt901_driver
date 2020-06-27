@@ -18,5 +18,9 @@ find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(serial_message REQUIRED)
 
+add_executable(converter src/converter.cpp)
+ament_target_dependencies(converter rclcpp serial_message)
+
+install(TARGETS converter DESTINATION lib/${PROJECT_NAME})
 
 ament_package()
