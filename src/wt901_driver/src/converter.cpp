@@ -12,11 +12,20 @@ public:
 private:
     inline void Convert(const serial_message::msg::Serial::SharedPtr data);
     rclcpp::Subscription<serial_message::msg::Serial>::SharedPtr input_;
-    rclcpp::Subscription<sensor_msgs::msg::Imu>::SharedPtr output_;
+    rclcpp::Publisher<sensor_msgs::msg::Imu>::SharedPtr output_;
 };
 
 Converter::Converter() : Node("imu_converter"){
-    input_ = this->create_subscription<serial_message::msg::Serial>("RxSerial1", 10, std::bind(&Converter::Convert, this, _1));
+    std::string input_topic, output_topic;
+
+    this->declare_parameter<std::string>("Input_Topic", "RxSerial1");
+    this->declare_parameter<std::string>("Output_Topic", "IMU1");
+
+    this->get_parameter<std::string>("Input_Topic", input_topic);
+    this->get_parameter<std::string>("Output_Topic", output_topic);
+
+    input_ = this->create_subscription<serial_message::msg::Serial>(input_topic, 10, std::bind(&Converter::Convert, this, _1));
+    output_ = this->create_publisher<sensor_msgs::msg::Imu>(output_topic, 10);
 }
 
 void Converter::Convert(const serial_message::msg::Serial::SharedPtr data){
